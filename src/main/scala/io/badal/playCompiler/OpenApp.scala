@@ -17,7 +17,7 @@
 package io.badal.playCompiler
 
 /**
-  * Created by sbadal on 11/24/15.
+  * Created by badal on 11/24/15.
   */
 object OpenApp {
 

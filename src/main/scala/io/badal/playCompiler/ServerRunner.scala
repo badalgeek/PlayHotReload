@@ -24,7 +24,7 @@ import play.runsupport._
 import sbt.{ConsoleLogger, Level}
 
 /**
-  * Created by sbadal on 9/24/15.
+  * Created by badal on 9/24/15.
   */
 class ServerRunner {
 

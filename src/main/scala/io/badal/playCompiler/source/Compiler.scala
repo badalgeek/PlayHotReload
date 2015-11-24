@@ -30,7 +30,7 @@ import xsbti.{AppProvider, ApplicationID, Launcher, Logger, ScalaProvider}
 import scala.collection._
 
 /**
-  * Created by sbadal on 11/6/15.
+  * Created by badal on 11/6/15.
   */
 object Compiler {
 

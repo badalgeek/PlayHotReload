@@ -19,7 +19,7 @@ package io.badal.playCompiler
 import java.io.File
 
 /**
-  * Created by sbadal on 11/23/15.
+  * Created by badal on 11/23/15.
   */
 class CompilerSettings(val appDir: File, val compileDir: File, val compileCacheDir: File, val confDirectory: File, val generatedSource: File,
                       val scalaVersion: String)

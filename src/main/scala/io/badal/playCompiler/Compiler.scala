@@ -31,7 +31,7 @@ import xsbti.{Problem, Severity}
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Created by sbadal on 11/23/15.
+  * Created by badal on 11/23/15.
   */
 object Compiler {
 
