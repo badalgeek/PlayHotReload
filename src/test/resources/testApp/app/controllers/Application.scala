@@ -21,11 +21,6 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    System.out.println("Main")
-    Ok("Yeah")
-  }
-
-  def index1 = Action {
     Ok(views.html.index("Hii"))
   }
 

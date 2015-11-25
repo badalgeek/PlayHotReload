@@ -25,7 +25,8 @@ import sbt.compiler.javac.{IncrementalCompilerJavaTools, JavaTools}
 import sbt.inc.{Analysis, FileBasedStore, IncOptions, Locate}
 import sbt.{ScalaInstance, _}
 import xsbti.compile.{CompileOrder, GlobalsCache}
-import xsbti.{AppProvider, ApplicationID, Launcher, Logger, ScalaProvider}
+import xsbti.{AppProvider, ApplicationID, Launcher, ScalaProvider}
+import sbt.Logger
 
 import scala.collection._
 
@@ -37,7 +38,9 @@ object Compiler {
   def getCompiler(compilerSettings: CompilerSettings, log: Logger): Compiler = {
     import compilerSettings._
 
-    val jars = System.getProperty("java.class.path").split(System.getProperty("path.separator"))
+    val jars = classPath.split(System.getProperty("path.separator"))
+    log.debug("Using classpath to compile scala and java source:")
+    jars.foreach(log.debug(_))
     val scalaInstance: ScalaInstance = createScalaInstance(scalaVersion, jars)
 
     val interfaceJar: File = getInterfaceJar(compileCacheDir, scalaVersion, jars, scalaInstance, log)

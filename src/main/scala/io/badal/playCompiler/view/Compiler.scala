@@ -1,4 +1,5 @@
 package io.badal.playCompiler.view
+
 /*
  * Copyright 2002-2015 the original author or authors.
  *
@@ -17,8 +18,8 @@ package io.badal.playCompiler.view
 
 import java.io.{File, FileFilter}
 
-import io.badal.playCompiler.CompilerSettings
 import io.badal.playCompiler.view.TwirlProblem.ProblemException
+import io.badal.playCompiler.CompilerSettings
 import play.twirl.compiler._
 import sbt._
 import xsbti.Logger

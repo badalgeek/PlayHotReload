@@ -25,20 +25,31 @@ import io.badal.playCompiler.view.{Compiler => ViewCompiler}
 import play.api.{PlayException, UnexpectedException}
 import play.routes.compiler.RoutesCompilationError
 import play.runsupport.Reloader._
-import sbt.{Logger, IO}
+import sbt.{IO, Logger}
 import xsbti.{Problem, Severity}
-
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by badal on 11/23/15.
   */
 object Compiler {
 
+  def compile(compileSettings: CompilerSettings, logger: Logger): Iterable[String] = {
+    val result = reloadCompiler(compileSettings, logger)()
+    result match {
+      case CompileFailure(exception) =>
+        throw exception
+      case CompileSuccess(sourceMap, classpath ) =>
+        sourceMap.keys.foreach(s => logger.info("Generated class file " + s))
+        sourceMap.keys
+    }
+  }
+
   def reloadCompiler: (CompilerSettings, Logger) =>
     () => CompileResult = (compilerSetting: CompilerSettings, log: Logger) => {
 
     import compilerSetting._
+    createDirIfNotExist(compileDir)
+    createDirIfNotExist(generatedSource)
     val compiler = SourceCompiler.getCompiler(compilerSetting, log)
     val routeCompiler = RouteCompiler.getCompiler(compilerSetting, log)
 
@@ -77,6 +88,12 @@ object Compiler {
 
   def originalSource(file: File): Option[File] = {
     play.twirl.compiler.MaybeGeneratedSource.unapply(file).map(_.file)
+  }
+
+  private def createDirIfNotExist(dir: File) = {
+    if (!dir.exists()) {
+      dir.mkdir()
+    }
   }
 
 }

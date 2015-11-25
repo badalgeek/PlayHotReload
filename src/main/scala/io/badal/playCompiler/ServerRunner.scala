@@ -21,26 +21,25 @@ import java.net.{URL, URLClassLoader}
 
 import play.runsupport.Reloader.PlayDevServer
 import play.runsupport._
-import sbt.{ConsoleLogger, Level}
+import sbt.{ConsoleLogger, Logger, Level}
 
 /**
   * Created by badal on 9/24/15.
   */
-class ServerRunner {
+object ServerRunner {
 
-
-  def runInturrupted(compilerSetting: CompilerSettings) = {
-    run(compilerSetting)
+  def runInturrupted(compilerSetting: CompilerSettings, serverSettings: ServerSettings, log:Logger) = {
+    run(compilerSetting, serverSettings, log)
   }
 
-  def runWithCloseHook(compilerSetting: CompilerSettings) = {
+  def runWithCloseHook(compilerSetting: CompilerSettings, serverSettings: ServerSettings, log:Logger) = {
     var mainThread = Thread.currentThread()
-    var devModeServer = run(compilerSetting)
+    var devModeServer = run(compilerSetting, serverSettings, log)
 
     println()
     println("(Server started, use Ctrl+C to stop and go back to the console...)")
     println()
-    OpenApp.open("http://localhost:8080")
+    OpenApp.open("http://" + serverSettings.hostName + ":" + serverSettings.port)
     sys.addShutdownHook(devModeServer.close())
 
     while(true) {
@@ -48,20 +47,22 @@ class ServerRunner {
     }
   }
 
-
-  def run(compilerSetting: CompilerSettings): PlayDevServer = {
+  def run(compilerSetting: CompilerSettings, serverSettings: ServerSettings, log: Logger): PlayDevServer = {
 
     import compilerSetting._
-    createCompileIfNotExist(compileDir)
+    import serverSettings._
 
-    val dependency = System.getProperty("java.class.path").split(":")
+    val dependency = classPath.split(":")
+
+    log.info("Using classpath to compile scala and java source:")
+    dependency.foreach(log.info(_))
+
     val externalDep = dependency.filter(_.endsWith("jar"))
 
     val runHooks = Seq.empty[RunHook]
     val javaOptions = Seq.empty[String]
     val dependencyClassPath = externalDep.map(new File(_))
     val dependencyURLClassLoader = Reloader.createURLClassLoader
-    val log = logger(Level.Info, true)
 
     val reloadCompile = Compiler.reloadCompiler(compilerSetting, log)
     val reloadClassLoader = Reloader.createDelegatedResourcesClassLoader
@@ -72,8 +73,9 @@ class ServerRunner {
     val fileWatchService = FileWatchService.sbt(1000)
     val docsClassPath = dependency.filter(_.endsWith("jar")).map(new File(_))
     val playDoc = dependency.filter(_.contains("play-omnidoc")).map(new File(_)).headOption
+    val assetTuple = assetMap.map(e => (e._1,e._2)).toSeq
     val assetClassLoader = (parent: ClassLoader) => {
-      new AssetsClassLoader(parent, Seq(("/public", new File("target/testApp/public"))))
+      new AssetsClassLoader(parent, assetTuple)
     }
     Reloader.startDevMode(
       runHooks,
@@ -88,21 +90,14 @@ class ServerRunner {
       fileWatchService,
       docsClassPath,
       playDoc,
-      8080,
-      "localhost",
-      new File("build/testResource"),
+      Integer2int(port),
+      hostName,
+      logDir,
       Seq.empty[(String, String)],
       Seq.empty[String],
       null,
       "play.core.server.DevServerStart"
     )
-  }
-
-
-  private def createCompileIfNotExist(compileDir: File) = {
-    if (!compileDir.exists()) {
-      compileDir.mkdir()
-    }
   }
 
   private def logger(level: Level.Value, color: Boolean): sbt.Logger = {

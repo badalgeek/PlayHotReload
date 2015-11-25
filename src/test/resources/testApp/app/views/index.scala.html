@@ -1,3 +1,8 @@
-@(message1: String)
+@(message: String)
 
-<h1>@message1, What's Up</h1>
+@html("Play on Maven") {
+    <h2>Play on Maven</h2>
+    <ul>
+        <li><em>@message</em></li>
+    </ul>
+}

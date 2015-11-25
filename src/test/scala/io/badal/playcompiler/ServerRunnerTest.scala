@@ -15,12 +15,13 @@
  */
 
 package io.badal.playcompiler
-import java.io.File
+import java.io.{PrintWriter, File}
 
-import io.badal.playCompiler.{CompilerSettings, ServerRunner}
+import io.badal.playCompiler.{ServerSettings, CompilerSettings, ServerRunner}
 import org.apache.commons.io.FileUtils
 import org.junit.{Before, Test}
 import org.scalatest.junit.AssertionsForJUnit
+import sbt.ConsoleLogger
 
 import scala.collection.mutable.ListBuffer
 
@@ -49,7 +50,14 @@ class ServerRunnerTest extends AssertionsForJUnit {
     FileUtils.copyFile(new File("target/testApp/conf/application.conf"), new File("target/testApp/target/classes/application.conf"))
 
     val fileList = new ListBuffer[String]
-    new ServerRunner().runWithCloseHook(new CompilerSettings(new File("target/testApp/app"), compiledDir, compileCacheDir, confDirectory, new File("target/testApp/target/generated-sources"), "2.10"))
+    val consoleOut: ConsoleLogger = ConsoleLogger.apply(new PrintWriter(System.out))
+    val assetMap: Map[String, File] = Map(("public", new File("target/testApp/public")))
+    ServerRunner.runWithCloseHook(
+      new CompilerSettings(new File("target/testApp/app"), compiledDir, compileCacheDir,
+        confDirectory, new File("target/testApp/target/generated-sources"), System.getProperty("java.class.path"), "2.10"),
+      new ServerSettings("localhost", 8081, new File("target/testApp/target/log"), assetMap),
+      consoleOut
+    )
   }
 
 }

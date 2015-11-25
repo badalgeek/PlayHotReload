@@ -27,7 +27,7 @@ object OpenApp {
     if (os.indexOf("win") >= 0) {
       rt.exec("rundll32 url.dll,FileProtocolHandler " + url)
     } else if (os.indexOf("mac") >= 0) {
-      rt.exec("open " + url);
+      rt.exec("open " + url)
     } else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
 
       rt.exec(Array(
